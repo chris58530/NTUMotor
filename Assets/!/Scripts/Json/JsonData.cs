@@ -11,5 +11,7 @@ namespace @_.Scripts.Json
         public List<double> PowerOut_W_;
         public List<double> Speed_rpm_;
         public List<double> Efficiency_percent_;
+
+      
     }
 }
