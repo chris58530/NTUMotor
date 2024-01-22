@@ -22,9 +22,12 @@ public class ConnectUDP : MonoBehaviour
     private Thread _thread = null!;
     private static System.Object _sendLock = new System.Object();
     private static Socket _peersock = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
+
+
     public static JsonData JsonData;
     [SerializeField] private GameObject xchartObj;
     private bool _success;
+    public static CmdData CmdData = new CmdData();
 
     public void Start()
     {
@@ -39,6 +42,7 @@ public class ConnectUDP : MonoBehaviour
 
         Observable.EveryUpdate().Where(_ => _success).First().Subscribe(_ =>
         {
+            if (xchartObj == null) return;
             xchartObj.gameObject.GetComponent<XChartTest>().enabled = true;
         }).AddTo(this);
     }
@@ -235,18 +239,23 @@ public class ConnectUDP : MonoBehaviour
 
     public void btnControlCmd_Click()
     {
-        string szCmd = "{ \"CMD\" : \"Func1\" }";
+        string szCmd = $@"{{
+            ""CMD"":""RunSim"",
+            ""Parameters"":{{
+                ""MotorType"":""{CmdData.motorType}"",
+                ""Voltage"":{CmdData.voltage},
+                ""LoadTest"":""{CmdData.loadTest}""
+            }}
+        }}";
+        Debug.Log(szCmd);
         SendCommand(szCmd);
     }
 
-    public void btnControlCmd2_Click(object sender, EventArgs e)
+    public void btnControlCmd2_Click()
     {
-        string szCmd = "{ \"CMD\" : \"Func2\",\r\n";
-        szCmd += "\"Param1\" : 10 }";
-        SendCommand(szCmd);
     }
 
-    public void btnControlCmd3_Click(object sender, EventArgs e)
+    public void btnControlCmd3_Click()
     {
         string szCmd = "{ \"CMD\" : \"SetSpeed\",\r\n";
         szCmd += "\"Param1\" : 10,\r\n";

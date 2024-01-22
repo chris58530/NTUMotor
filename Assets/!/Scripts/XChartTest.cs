@@ -68,19 +68,22 @@ public class XChartTest : MonoBehaviour
         line.symbol.type = SymbolType.None;
         line.serieName = serieName;
 
-
         if (isFirst)
         {
-            chart.AddXAxisData("" + _data.Time_sec_);
+            chart.AddXAxisData(Speed.ToString());
             isFirst = false;
         }
-        int batchSize = 10;
+
+        int batchSize = 5; // 每五个数据点更新一次
+
         for (int i = 0; i < dataList.Count; i++)
         {
-            chart.AddData(dataIndex, dataList[i]);
-            if (i % batchSize == 0)
+
+            if ((i + 1) % batchSize == 0)
             {
-                yield return null;
+                chart.AddData(dataIndex, dataList[i]);
+
+                yield return null; // 等待一帧的时间
             }
         }
 
