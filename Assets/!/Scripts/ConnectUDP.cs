@@ -98,8 +98,8 @@ public class ConnectUDP : MonoBehaviour
             /* return true if the current instance receives a signal.
              * If the current instance is never signaled, WaitOne never returns
              */
-            if (_shutdownEvent.WaitOne(0))
-                break;
+            // if (_shutdownEvent.WaitOne(0))
+            //     break;
             /* if (_shutdownEvent.WaitOne(Timeout.Infinite))
              * 因為沒有收到signal, 所以會停在if()這一行, 造成cnt無法累加
              */
