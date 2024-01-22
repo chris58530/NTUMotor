@@ -233,7 +233,7 @@ public class ConnectUDP : MonoBehaviour
     }
 
 
-    public void btnControlCmd_Click(object sender, EventArgs e)
+    public void btnControlCmd_Click()
     {
         string szCmd = "{ \"CMD\" : \"Func1\" }";
         SendCommand(szCmd);
