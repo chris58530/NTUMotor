@@ -15,7 +15,7 @@ using Debug = UnityEngine.Debug;
 
 public class ConnectUDP : MonoBehaviour
 {
-    private const string UDP_HOST_IP = "127.0.0.1";
+    private const string UDP_HOST_IP = "192.168.3.8";
     private const int UDP_HOST_PORT = 7070;
     private ManualResetEvent _shutdownEvent = new ManualResetEvent(false);
     private ManualResetEvent _pauseEvent = new ManualResetEvent(true);
@@ -98,8 +98,8 @@ public class ConnectUDP : MonoBehaviour
             /* return true if the current instance receives a signal.
              * If the current instance is never signaled, WaitOne never returns
              */
-            // if (_shutdownEvent.WaitOne(0))
-            //     break;
+            if (_shutdownEvent.WaitOne(0))
+                break;
             /* if (_shutdownEvent.WaitOne(Timeout.Infinite))
              * 因為沒有收到signal, 所以會停在if()這一行, 造成cnt無法累加
              */
