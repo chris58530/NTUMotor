@@ -15,7 +15,7 @@ using Debug = UnityEngine.Debug;
 
 public class ConnectUDP : MonoBehaviour
 {
-    private const string UDP_HOST_IP = "192.168.3.8";
+    private const string UDP_HOST_IP = "127.0.0.1"; //發布時更改成對象的
     private const int UDP_HOST_PORT = 7070;
     private ManualResetEvent _shutdownEvent = new ManualResetEvent(false);
     private ManualResetEvent _pauseEvent = new ManualResetEvent(true);
@@ -25,7 +25,7 @@ public class ConnectUDP : MonoBehaviour
 
 
     public static JsonData JsonData;
-    [SerializeField] private GameObject xchartObj;
+    [SerializeField] private ChartManager ChartManager;
     private bool _success;
     public static CmdData CmdData = new CmdData();
 
@@ -40,11 +40,16 @@ public class ConnectUDP : MonoBehaviour
         _thread.Start();
         Debug.Log("Thread started running");
 
-        Observable.EveryUpdate().Where(_ => _success).First().Subscribe(_ =>
-        {
-            if (xchartObj == null) return;
-            xchartObj.gameObject.GetComponent<XChartTest>().enabled = true;
-        }).AddTo(this);
+        Observable.EveryUpdate()
+            .Where(_ => _success).First()
+            .Subscribe(_ =>
+            {
+                if (ChartManager == null) return;
+                ChartManager.gameObject.GetComponent<ChartManager>().SpawnChart();
+
+
+                _success = false;
+            }).AddTo(this);
     }
 
     private void OnDisable()
@@ -251,15 +256,16 @@ public class ConnectUDP : MonoBehaviour
         SendCommand(szCmd);
     }
 
-    public void btnControlCmd2_Click()
+    public void SendQuery_Click()
     {
-    }
 
-    public void btnControlCmd3_Click()
-    {
-        string szCmd = "{ \"CMD\" : \"SetSpeed\",\r\n";
-        szCmd += "\"Param1\" : 10,\r\n";
-        szCmd += "\"Param2\" : \"Video\" }";
+
+        string szCmd = $@"{{
+            ""CMD"":""Query""
+        }}";
         SendCommand(szCmd);
+        
+        ChartManager.gameObject.GetComponent<ChartManager>().SpawnChart();
+
     }
 }

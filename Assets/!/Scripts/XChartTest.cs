@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Data;
 using System.IO;
+using System.Linq;
 using _.Scripts.Json;
 using UnityEngine;
 using XCharts.Runtime;
@@ -16,8 +17,9 @@ public class XChartTest : MonoBehaviour
     private List<double> Speed = new List<double>();
     private List<double> Efficiency = new List<double>();
 
-    void Start()
+    public void Start()
     {
+       
         _data = ConnectUDP.JsonData;
         if (_data == null)
         {
@@ -26,18 +28,22 @@ public class XChartTest : MonoBehaviour
         }
 
 
-        PowerIn.AddRange(_data.PowerIn_W_);
-        PowerOut.AddRange(_data.PowerOut_W_);
-        Speed.AddRange(_data.Speed_rpm_);
-        Efficiency.AddRange(_data.Efficiency_percent_);
+        PowerIn.AddRange(_data.SimResult.PowerIn_W_);
+        PowerOut.AddRange(_data.SimResult.PowerOut_W_);
+        Speed.AddRange(_data.SimResult.Speed_rpm_);
+        Efficiency.AddRange(_data.SimResult.Efficiency_percent_);
+
 
         Debug.Log(PowerIn.Count);
 
         chart = gameObject.GetComponent<LineChart>();
+        chart.ClearData();
+
         if (chart == null)
         {
             chart = gameObject.AddComponent<LineChart>();
-            chart.Init();
+            chart.Init();      
+
         }
 
         var title = chart.EnsureChartComponent<Title>();
@@ -46,55 +52,54 @@ public class XChartTest : MonoBehaviour
         var legend = chart.EnsureChartComponent<Legend>();
         legend.show = true;
 
-        var xAxis = chart.EnsureChartComponent<XAxis>();
-        xAxis.type = Axis.AxisType.Value;
+        //
+        // var xAxis = chart.EnsureChartComponent<XAxis>();
+        // xAxis.type = Axis.AxisType.Value;
+        //
+        // var yAxis = chart.EnsureChartComponent<YAxis>();
+        // yAxis.type = Axis.AxisType.Value;
 
-        var yAxis = chart.EnsureChartComponent<YAxis>();
-        yAxis.type = Axis.AxisType.Value;
 
-        StartCoroutine(LoadChartData("PowerIn", PowerIn, 0));
-        StartCoroutine(LoadChartData("PowerOut", PowerOut, 1));
-        StartCoroutine(LoadChartData("Speed", Speed, 2));
-        StartCoroutine(LoadChartData("Efficiency", Efficiency, 3));
+        StartCoroutine(LoadChartData("W", _data.SimResult.PowerOut_W_, 0));
+        StartCoroutine(LoadChartData("Amp", _data.SimResult.Current_A_, 1));
+        StartCoroutine(LoadChartData("Eff", _data.SimResult.Efficiency_percent_, 2));
+        StartCoroutine(LoadChartData("Volt", _data.SimResult.Voltage_V_, 3));
+        StartCoroutine(LoadChartData("Kgcm", _data.SimResult.Torque_Nm_, 4));
     }
 
-    private bool isFirst = true;
+    private bool _isFirst = true;
 
     IEnumerator LoadChartData(string serieName, List<double> dataList, int dataIndex)
     {
         chart.ClearData();
-
         var line = chart.AddSerie<Line>(serieName);
-        line.symbol.type = SymbolType.None;
         line.serieName = serieName;
-
-        if (isFirst)
+        line.symbol.type = SymbolType.None;
+        
+        double minValue = Speed.Min();
+        int minIntValue = (int)minValue;
+        double maxValue = Speed.Max();
+        int maxIntValue = (int)maxValue;
+        if (_isFirst)
         {
+            var xAxis = chart.EnsureChartComponent<XAxis>();
+            xAxis.min = minIntValue;
+            xAxis.max = maxIntValue;
             chart.AddXAxisData(Speed.ToString());
-            isFirst = false;
+            _isFirst = false;
         }
 
-        int batchSize = 5; // 每五个数据点更新一次
+        int batchSize =10;
 
-        for (int i = 0; i < dataList.Count; i++)
+        for (int i = maxIntValue; i < dataList.Count; i++)
         {
-
-            if ((i + 1) % batchSize == 0)
+            chart.AddData(dataIndex, Speed[i], Math.Round(dataList[i], 2));
+            if ((i - maxIntValue + 1) % batchSize == 0)
             {
-                chart.AddData(dataIndex, dataList[i]);
-
-                yield return null; // 等待一帧的时间
+                yield return null;
             }
         }
 
         yield return null;
-    }
-
-    public void ReStartLine()
-    {
-        StartCoroutine(LoadChartData("PowerIn", _data.PowerIn_W_, 0));
-        StartCoroutine(LoadChartData("PowerOut", _data.PowerOut_W_, 1));
-        StartCoroutine(LoadChartData("Speed", _data.Speed_rpm_, 2));
-        StartCoroutine(LoadChartData("Efficiency", _data.Efficiency_percent_, 3));
     }
 }
