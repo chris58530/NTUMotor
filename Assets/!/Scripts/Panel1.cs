@@ -1,13 +1,15 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class Panel1 : MonoBehaviour
 {
     [SerializeField] private Sprite[] motorImages;
+    [SerializeField] private string[] motorString;
     private int currentImageIndex = 0;
-
+    [SerializeField] private TMP_Text texts;
     void Start()
     {
         ShowImage(currentImageIndex);
@@ -15,22 +17,20 @@ public class Panel1 : MonoBehaviour
 
     void ShowImage(int index)
     {
-        var sprite = GetComponent<Image>().sprite = motorImages[index];
-        //這裡插入SO數值
+      GetComponent<Image>().sprite = motorImages[index];
+        texts.text = motorString[index];
         Debug.Log(index);
         ConnectUDP.CmdData.motorType = (MotorType)index;
     }
 
     public void NextImage()
     {
-        // 切换到下一张图像
         currentImageIndex = (currentImageIndex + 1) % motorImages.Length;
         ShowImage(currentImageIndex);
     }
 
     public void PreviousImage()
     {
-        // 切换到上一张图像
         currentImageIndex = (currentImageIndex - 1 + motorImages.Length) % motorImages.Length;
         ShowImage(currentImageIndex);
     }

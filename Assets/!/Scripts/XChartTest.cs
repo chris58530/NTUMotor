@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using _.Scripts.Json;
 using UnityEngine;
+using UnityEngine.UI;
 using XCharts.Runtime;
 
 public class XChartTest : MonoBehaviour
@@ -68,14 +69,15 @@ public class XChartTest : MonoBehaviour
     }
 
     private bool _isFirst = true;
+    public XCharts.Runtime.Line line;
+    private Toggle[] toggle;
 
     IEnumerator LoadChartData(string serieName, List<double> dataList, int dataIndex)
     {
         chart.ClearData();
-        var line = chart.AddSerie<Line>(serieName);
+        line = chart.AddSerie<Line>(serieName);
         line.serieName = serieName;
         line.symbol.type = SymbolType.None;
-        
         double minValue = Speed.Min();
         int minIntValue = (int)minValue;
         double maxValue = Speed.Max();
@@ -101,5 +103,18 @@ public class XChartTest : MonoBehaviour
         }
 
         yield return null;
+    }
+    public void OnToggleValueChanged(bool isOn)
+    {
+        if (isOn)
+        {
+            line.lineStyle.opacity = 0;
+            Debug.Log(line);
+            Debug.Log("opacuty == 0 ");
+        }
+        else
+        {
+            line.lineStyle.opacity = 1;
+        }
     }
 }

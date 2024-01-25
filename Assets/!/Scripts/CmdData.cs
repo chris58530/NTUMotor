@@ -5,9 +5,10 @@ using UnityEngine;
 public enum MotorType
 {
     PMDC,
-    SeriesExcited,
+    SeparatelyExcited,
     ShuntExcited,
-    SeparatelyExcited
+    SeriesExcited,
+   
 }
 
 public enum LoadTest

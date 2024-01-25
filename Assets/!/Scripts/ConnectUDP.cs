@@ -16,6 +16,7 @@ using Debug = UnityEngine.Debug;
 public class ConnectUDP : MonoBehaviour
 {
     private const string UDP_HOST_IP = "127.0.0.1"; //發布時更改成對象的
+    // private const string UDP_HOST_IP = "192.168.200.177"; //發布時更改成對象的
     private const int UDP_HOST_PORT = 7070;
     private ManualResetEvent _shutdownEvent = new ManualResetEvent(false);
     private ManualResetEvent _pauseEvent = new ManualResetEvent(true);
@@ -41,7 +42,7 @@ public class ConnectUDP : MonoBehaviour
         Debug.Log("Thread started running");
 
         Observable.EveryUpdate()
-            .Where(_ => _success).First()
+            .Where(_ => _success)
             .Subscribe(_ =>
             {
                 if (ChartManager == null) return;
