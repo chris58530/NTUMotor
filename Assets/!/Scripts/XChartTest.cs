@@ -20,7 +20,8 @@ public class XChartTest : MonoBehaviour
 
     public void Start()
     {
-       
+   
+
         _data = ConnectUDP.JsonData;
         if (_data == null)
         {
@@ -43,8 +44,7 @@ public class XChartTest : MonoBehaviour
         if (chart == null)
         {
             chart = gameObject.AddComponent<LineChart>();
-            chart.Init();      
-
+            chart.Init();
         }
 
         var title = chart.EnsureChartComponent<Title>();
@@ -61,23 +61,47 @@ public class XChartTest : MonoBehaviour
         // yAxis.type = Axis.AxisType.Value;
 
 
-        StartCoroutine(LoadChartData("W", _data.SimResult.PowerOut_W_, 0));
-        StartCoroutine(LoadChartData("Amp", _data.SimResult.Current_A_, 1));
-        StartCoroutine(LoadChartData("Eff", _data.SimResult.Efficiency_percent_, 2));
-        StartCoroutine(LoadChartData("Volt", _data.SimResult.Voltage_V_, 3));
-        StartCoroutine(LoadChartData("Kgcm", _data.SimResult.Torque_Nm_, 4));
+     
+        
+        double maxPowerOut = _data.SimResult.PowerOut_W_.Max();
+        double minPowerOut = _data.SimResult.PowerOut_W_.Min();
+
+        double maxCurrent = _data.SimResult.Current_A_.Max();
+        double minCurrent = _data.SimResult.Current_A_.Min();
+
+        double maxEfficiency = _data.SimResult.Efficiency_percent_.Max();
+        double minEfficiency = _data.SimResult.Efficiency_percent_.Min();
+
+        double maxVoltage = _data.SimResult.Voltage_V_.Max();
+        double minVoltage = _data.SimResult.Voltage_V_.Min();
+
+        double maxTorque =  _data.SimResult.Torque_Nm_.Max();
+        double minTorque =  _data.SimResult.Torque_Nm_.Min();
+
+        // 找出最大的最大值和最小的最小值所对应的列表
+        List<double> maxValues = new List<double> { maxPowerOut, maxCurrent, maxEfficiency, maxVoltage, maxTorque };
+        List<double> minValues = new List<double> { minPowerOut, minCurrent, minEfficiency, minVoltage, minTorque };
+
+        indexOfMaxValue = maxValues.IndexOf(maxValues.Max());
+       indexOfMinValue = minValues.IndexOf(minValues.Min());
+       
+       StartCoroutine(LoadChartData("W", _data.SimResult.PowerOut_W_, 0));
+       StartCoroutine(LoadChartData("Amp", _data.SimResult.Current_A_, 1));
+       StartCoroutine(LoadChartData("Eff", _data.SimResult.Efficiency_percent_, 2));
+       StartCoroutine(LoadChartData("Volt", _data.SimResult.Voltage_V_, 3));
+       StartCoroutine(LoadChartData("Kgcm", _data.SimResult.Torque_Nm_, 4));
     }
 
+    private int indexOfMaxValue;
+    private int indexOfMinValue;
     private bool _isFirst = true;
-    public XCharts.Runtime.Line line;
-    private Toggle[] toggle;
 
     IEnumerator LoadChartData(string serieName, List<double> dataList, int dataIndex)
     {
         chart.ClearData();
-        line = chart.AddSerie<Line>(serieName);
-        line.serieName = serieName;
-        line.symbol.type = SymbolType.None;
+        var serie = chart.AddSerie<Line>(serieName);
+        serie.serieName = serieName;
+        serie.symbol.type = SymbolType.None;
         double minValue = Speed.Min();
         int minIntValue = (int)minValue;
         double maxValue = Speed.Max();
@@ -85,13 +109,14 @@ public class XChartTest : MonoBehaviour
         if (_isFirst)
         {
             var xAxis = chart.EnsureChartComponent<XAxis>();
+            // xAxis.min = (int)_data.SimResult.PowerOut_W_[^1];
             xAxis.min = minIntValue;
             xAxis.max = maxIntValue;
-            chart.AddXAxisData(Speed.ToString());
-            _isFirst = false;
+
+            // _isFirst = false;
         }
 
-        int batchSize =10;
+        int batchSize = 10;
 
         for (int i = maxIntValue; i < dataList.Count; i++)
         {
@@ -104,17 +129,71 @@ public class XChartTest : MonoBehaviour
 
         yield return null;
     }
-    public void OnToggleValueChanged(bool isOn)
+
+    public void OnToggleValueChanged0(bool isOn)
     {
+        chart = gameObject.GetComponent<LineChart>();
         if (isOn)
-        {
-            line.lineStyle.opacity = 0;
-            Debug.Log(line);
-            Debug.Log("opacuty == 0 ");
+        {          
+
+            chart.series[0].show = true;
         }
         else
         {
-            line.lineStyle.opacity = 1;
+            chart.series[0].show = false;
+        }
+    }
+
+    public void OnToggleValueChanged1(bool isOn)
+    {
+        chart = gameObject.GetComponent<LineChart>();
+        if (isOn)
+        {
+            chart.series[1].show = true;
+        }
+        else
+        {
+            chart.series[1].show = false;
+        }
+    }
+
+    public void OnToggleValueChanged2(bool isOn)
+    {
+        chart = gameObject.GetComponent<LineChart>();
+        if (isOn)
+        {
+            chart.series[2].show = true;
+        }
+        else
+        {
+            chart.series[2].show = false;
+        }
+    }
+
+    public void OnToggleValueChanged3(bool isOn)
+    {
+        chart = gameObject.GetComponent<LineChart>();
+        if (isOn)
+        {
+            chart.series[3].show = true;
+        }
+        else
+        {
+            chart.series[3].show = false;
+        }
+    }
+
+    public void OnToggleValueChanged4(bool isOn)
+    {
+        chart = gameObject.GetComponent<LineChart>();
+        if (isOn)
+        {
+            chart.series[4].show = true;
+            
+        }
+        else
+        {
+            chart.series[4].show = false;
         }
     }
 }
